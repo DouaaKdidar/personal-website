@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Douaa Kdidar — Computer Science, EPFL</title>
+<meta name="description" content="Douaa Kdidar — Computer Science student at EPFL. Projects in machine learning, game AI, blockchain and aerospace, built from first principles.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #0f2540;
+    --navy-deep: #0a1b30;
+    --line: #2e5c8a;
+    --line-soft: rgba(46,92,138,0.35);
+    --paper: #eaf1f6;
+    --paper-dim: #93aec6;
+    --copper: #e08a3e;
+    --copper-dim: rgba(224,138,62,0.35);
+    --cyan: #6fc3d9;
+    --cyan-dim: rgba(111,195,217,0.35);
+    --radius: 3px;
+    --display: 'Space Grotesk', sans-serif;
+    --body: 'IBM Plex Sans', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  }
+
+  body{
+    margin: 0;
+    background:
+      linear-gradient(var(--line-soft) 1px, transparent 1px) 0 0 / 100% 32px,
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px) 0 0 / 32px 100%,
+      var(--navy);
+    background-attachment: fixed, fixed, fixed;
+    opacity: 1;
+    color: var(--paper);
+    font-family: var(--body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before{ content:''; }
+
+  a{ color: inherit; }
+  a:focus-visible, button:focus-visible{
+    outline: 2px solid var(--cyan);
+    outline-offset: 3px;
+  }
+
+  h1,h2,h3{ font-family: var(--display); margin: 0; letter-spacing: -0.01em; }
+  p{ margin: 0; }
+
+  .mono{ font-family: var(--mono); }
+
+  .wrap{
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10,27,48,0.88);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav-inner{
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .nav-brand{
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--paper);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-brand b{ color: var(--copper); font-weight: 600; }
+  .nav-links{
+    display: flex;
+    gap: 22px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .nav-links a{
+    text-decoration: none;
+    color: var(--paper-dim);
+    white-space: nowrap;
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .nav-links a:hover{ color: var(--cyan); border-color: var(--cyan-dim); }
+  .nav-links::-webkit-scrollbar{ display: none; }
+
+  /* ---------- SHEET (signature crop-mark component) ---------- */
+  .sheet{
+    position: relative;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 72px 28px;
+    border-left: 1px solid var(--line-soft);
+    border-right: 1px solid var(--line-soft);
+  }
+  .sheet + .sheet{ border-top: 1px solid var(--line-soft); }
+
+  .crop{
+    position: relative;
+  }
+  .crop::before, .crop::after{
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+  }
+  .crop::before{
+    top: -1px; left: -1px;
+    border-top: 2px solid var(--cyan);
+    border-left: 2px solid var(--cyan);
+  }
+  .crop::after{
+    bottom: -1px; right: -1px;
+    border-bottom: 2px solid var(--cyan);
+    border-right: 2px solid var(--cyan);
+  }
+  .crop .crop-tr{
+    position: absolute; top: -1px; right: -1px; width: 14px; height: 14px;
+    border-top: 2px solid var(--cyan); border-right: 2px solid var(--cyan);
+    pointer-events: none;
+  }
+  .crop .crop-bl{
+    position: absolute; bottom: -1px; left: -1px; width: 14px; height: 14px;
+    border-bottom: 2px solid var(--cyan); border-left: 2px solid var(--cyan);
+    pointer-events: none;
+  }
+
+  .sheet-label{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 40px;
+  }
+  .sheet-label span:last-child{ color: var(--paper-dim); }
+
+  .reveal{
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.is-visible{ opacity: 1; transform: translateY(0); }
+
+  /* ---------- HERO ---------- */
+  #hero{ padding-top: 56px; }
+  .hero-grid{
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .eyebrow{
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 18px;
+  }
+  h1.name{
+    font-size: clamp(42px, 6vw, 68px);
+    font-weight: 700;
+    color: var(--paper);
+    line-height: 1.02;
+  }
+  .role-line{
+    font-family: var(--mono);
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    color: var(--cyan);
+    margin-top: 14px;
+    text-transform: uppercase;
+  }
+  .tagline{
+    margin-top: 22px;
+    font-size: 17px;
+    color: var(--paper-dim);
+    max-width: 46ch;
+  }
+
+  .stat-row{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    margin-top: 44px;
+  }
+  .stat{
+    min-width: 150px;
+  }
+  .stat .num{
+    font-family: var(--display);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--copper);
+  }
+  .stat .bar{
+    width: 100%;
+    height: 1px;
+    background: repeating-linear-gradient(to right, var(--line) 0 6px, transparent 6px 10px);
+    margin: 8px 0;
+  }
+  .stat .lbl{
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--paper-dim);
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+  }
+
+  .link-row{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 44px;
+  }
+  .badge-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    text-decoration: none;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--paper);
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+  .badge-link:hover{ border-color: var(--cyan); color: var(--cyan); background: rgba(111,195,217,0.06); }
+  .badge-link.primary{ border-color: var(--copper); color: var(--copper); }
+  .badge-link.primary:hover{ background: rgba(224,138,62,0.08); }
+  .badge-tag{
+    font-size: 10px;
+    font-weight: 600;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    padding: 1px 5px;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-diagram{ width: 100%; height: auto; }
+  .hero-diagram path, .hero-diagram circle{
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    animation: draw 2.2s ease forwards;
+  }
+  @keyframes draw{ to{ stroke-dashoffset: 0; } }
+
+  /* ---------- ABOUT ---------- */
+  .about-heading{
+    font-size: clamp(26px, 3.4vw, 34px);
+    font-weight: 600;
+    margin-bottom: 26px;
+    max-width: 20ch;
+  }
+  .about-body{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  .about-body p{
+    color: var(--paper-dim);
+    font-size: 15.5px;
+  }
+  .about-body p + p{ margin-top: 16px; }
+  .note-box{
+    margin-top: 28px;
+    padding: 16px 18px;
+    border-left: 2px solid var(--copper);
+    background: rgba(224,138,62,0.05);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--paper);
+    line-height: 1.7;
+  }
+
+  /* ---------- EDUCATION (timeline) ---------- */
+  .timeline{
+    position: relative;
+    padding-left: 32px;
+  }
+  .timeline::before{
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: repeating-linear-gradient(to bottom, var(--line) 0 5px, transparent 5px 9px);
+  }
+  .tl-item{ position: relative; padding-bottom: 40px; }
+  .tl-item:last-child{ padding-bottom: 0; }
+  .tl-item::before{
+    content: '';
+    position: absolute;
+    left: -32px;
+    top: 4px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--navy);
+    border: 2px solid var(--cyan);
+  }
+  .tl-top{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .tl-school{ font-family: var(--display); font-size: 19px; font-weight: 600; color: var(--paper); }
+  .tl-date{ font-family: var(--mono); font-size: 12px; color: var(--cyan); white-space: nowrap; }
+  .tl-degree{ color: var(--paper-dim); font-size: 15px; margin-bottom: 6px; }
+  .tl-meta{ font-family: var(--mono); font-size: 12px; color: var(--copper); }
+
+  /* ---------- EXPERIENCE ---------- */
+  .exp-card{
+    padding: 26px 26px;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    margin-bottom: 22px;
+  }
+  .exp-card:last-child{ margin-bottom: 0; }
+  .exp-top{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .exp-role{ font-family: var(--display); font-size: 19px; font-weight: 600; }
+  .exp-org{ font-family: var(--mono); font-size: 12.5px; color: var(--cyan); margin-bottom: 14px; }
+  .exp-date{ font-family: var(--mono); font-size: 12px; color: var(--paper-dim); white-space: nowrap; }
+  .exp-card ul{ margin: 0; padding-left: 18px; color: var(--paper-dim); font-size: 14.5px; }
+  .exp-card li{ margin-bottom: 8px; }
+  .exp-card li:last-child{ margin-bottom: 0; }
+
+  /* ---------- PROJECTS ---------- */
+  .proj-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .proj-card{
+    position: relative;
+    padding: 22px 20px 20px;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .proj-card:hover{ border-color: var(--cyan-dim); transform: translateY(-2px); }
+  .proj-title{ font-family: var(--display); font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+  .proj-tags{ display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tag{
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.02em;
+    color: var(--cyan);
+    border: 1px solid var(--cyan-dim);
+    border-radius: 2px;
+    padding: 2px 6px;
+  }
+  .proj-desc{ color: var(--paper-dim); font-size: 14px; flex-grow: 1; margin-bottom: 16px; }
+  .proj-foot{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 11.5px;
+  }
+  .proj-metric{ color: var(--copper); }
+  .proj-link{ color: var(--paper); text-decoration: none; white-space: nowrap; }
+  .proj-link:hover{ color: var(--cyan); }
+  .proj-noun{ color: var(--paper-dim); font-style: normal; }
+
+  .more-repos{
+    margin-top: 30px;
+    padding-top: 26px;
+    border-top: 1px dashed var(--line-soft);
+  }
+  .more-repos-label{
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--paper-dim);
+    margin-bottom: 14px;
+  }
+  .chip-row{ display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip-link{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--paper);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 7px 12px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .chip-link:hover{ border-color: var(--cyan); color: var(--cyan); }
+  .chip-static{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--paper-dim);
+    border: 1px dashed var(--line-soft);
+    border-radius: var(--radius);
+    padding: 7px 12px;
+  }
+
+  /* ---------- ACHIEVEMENTS (ledger) ---------- */
+  .ledger{ border-top: 1px solid var(--line-soft); }
+  .ledger-row{
+    display: grid;
+    grid-template-columns: 90px 1fr 110px;
+    gap: 16px;
+    align-items: baseline;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .ledger-date{ font-family: var(--mono); font-size: 12px; color: var(--cyan); }
+  .ledger-text{ font-size: 15px; color: var(--paper); }
+  .ledger-text b{ color: var(--paper); font-weight: 600; }
+  .ledger-sub{ display: block; font-size: 13px; color: var(--paper-dim); margin-top: 3px; }
+  .ledger-mark{ font-family: var(--mono); font-size: 11px; color: var(--copper); text-align: right; letter-spacing: 0.04em; }
+
+  /* ---------- SKILLS ---------- */
+  .skills-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 26px;
+  }
+  .skill-panel{
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .skill-panel h3{
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 16px;
+  }
+  .skill-panel .chip-row{ gap: 8px; }
+  .skill-panel .tag{ color: var(--paper); border-color: var(--line); font-size: 11.5px; }
+
+  .lang-row{
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--line-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .lang-row .mono-label{ font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--paper-dim); margin-right: 6px; }
+
+  /* ---------- CONTACT / FOOTER ---------- */
+  #contact{ text-align: center; padding-bottom: 60px; }
+  .contact-heading{ font-size: clamp(28px, 4vw, 40px); font-weight: 600; margin-bottom: 18px; }
+  .contact-sub{ color: var(--paper-dim); max-width: 46ch; margin: 0 auto 36px; }
+  .contact-links{ display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; margin-bottom: 56px; }
+
+  .title-block{
+    max-width: 1080px;
+    margin: 0 auto;
+    border-top: 1px solid var(--line-soft);
+    padding: 18px 28px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--paper-dim);
+    text-transform: uppercase;
+  }
+  .title-block span b{ color: var(--cyan); font-weight: 500; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 860px){
+    .hero-grid{ grid-template-columns: 1fr; }
+    .hero-diagram{ max-width: 260px; margin: 0 auto; }
+    .about-body{ grid-template-columns: 1fr; }
+    .proj-grid{ grid-template-columns: 1fr 1fr; }
+    .skills-grid{ grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px){
+    .sheet{ padding: 52px 20px; }
+    .proj-grid{ grid-template-columns: 1fr; }
+    .ledger-row{ grid-template-columns: 1fr; gap: 4px; }
+    .ledger-mark{ text-align: left; }
+    .stat{ min-width: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#hero" class="nav-brand"><b>D.</b>KDIDAR</a>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#education">Education</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#achievements">Achievements</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <section id="hero" class="sheet crop">
+    <span class="crop-tr"></span><span class="crop-bl"></span>
+    <div class="sheet-label">
+      <span>SHEET 00 / INDEX</span>
+      <span>EPFL — LAUSANNE, CH · 46.52°N 6.63°E</span>
+    </div>
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Computer Science — EPFL, Class of 2028</div>
+        <h1 class="name">Douaa<br>Kdidar</h1>
+        <div class="role-line">Builder, from first principles</div>
+        <p class="tagline">I rebuild the fundamental version of things before trusting the library — a transformer trained from scratch, a Monte Carlo Tree Search opponent, a smart-contract ticketing system — then measure exactly how well each one holds up.</p>
+
+        <div class="stat-row">
+          <div class="stat">
+            <div class="num">5.94 / 6</div>
+            <div class="bar"></div>
+            <div class="lbl">EPFL Computer Science<br>cumulative average</div>
+          </div>
+          <div class="stat">
+            <div class="num">6th / 300k+</div>
+            <div class="bar"></div>
+            <div class="lbl">Moroccan National<br>Baccalaureate ranking</div>
+          </div>
+          <div class="stat">
+            <div class="num">2nd place</div>
+            <div class="bar"></div>
+            <div class="lbl">ConquerHack<br>Hackathon, 2026</div>
+          </div>
+        </div>
+
+        <div class="link-row">
+          <a class="badge-link primary" href="mailto:douaa.kdidar@epfl.ch">Email</a>
+          <a class="badge-link" href="https://github.com/DouaaKdidar" target="_blank" rel="noopener"><span class="badge-tag">GH</span> GitHub</a>
+          <a class="badge-link" href="https://www.linkedin.com/in/douaa-kdidar/" target="_blank" rel="noopener"><span class="badge-tag">LI</span> LinkedIn</a>
+          <a class="badge-link" href="https://gitlab.com/DouaaKdidar" target="_blank" rel="noopener"><span class="badge-tag">GL</span> GitLab</a>
+        </div>
+      </div>
+
+      <svg class="hero-diagram" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="60" cy="60" r="5" stroke="#6fc3d9" stroke-width="1.5"/>
+        <circle cx="200" cy="40" r="5" stroke="#e08a3e" stroke-width="1.5"/>
+        <circle cx="270" cy="140" r="5" stroke="#6fc3d9" stroke-width="1.5"/>
+        <circle cx="160" cy="170" r="7" stroke="#e08a3e" stroke-width="1.5"/>
+        <circle cx="70" cy="220" r="5" stroke="#6fc3d9" stroke-width="1.5"/>
+        <circle cx="230" cy="260" r="5" stroke="#6fc3d9" stroke-width="1.5"/>
+        <circle cx="130" cy="290" r="5" stroke="#e08a3e" stroke-width="1.5"/>
+        <path d="M60 60 L160 170 M200 40 L160 170 M270 140 L160 170 M160 170 L70 220 M160 170 L230 260 M70 220 L130 290 M230 260 L130 290 M60 60 L200 40" stroke="#2e5c8a" stroke-width="1.2"/>
+        <path d="M20 20 L20 300 L300 300" stroke="#2e5c8a" stroke-width="1" stroke-dasharray="2 6" opacity="0.6"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="sheet crop reveal">
+    <span class="crop-tr"></span><span class="crop-bl"></span>
+    <div class="sheet-label"><span>SHEET 01 / ABOUT</span><span>PROFILE</span></div>
+    <h2 class="about-heading">Precision, then scale.</h2>
+    <div class="about-body">
+      <p>Douaa is a second-year Computer Science student at EPFL, currently holding a 5.94/6.00 cumulative average. Before EPFL, she ranked 6th nationally out of more than 300,000 students in the Moroccan Baccalaureate and graduated as her high school's valedictorian across every major, out of 200+ students.</p>
+      <div>
+        <p>Her projects follow one habit: rebuild the core mechanism from scratch before trusting it. That's meant training a transformer language model on campaign-rally transcripts, writing a parallelized Monte Carlo Tree Search agent to play the board game Azul, and hand-implementing decision trees and backpropagation during a graduate-level machine learning specialization.</p>
+        <p style="margin-top:16px;">The same instinct shows up off-screen — she has soldered the pressure sensors on a student rocket, and organizes sponsor meetings and cross-team coordination for EPFL's Rocket Team.</p>
+      </div>
+    </div>
+    <div class="note-box">CURRENTLY EXPLORING → graph &amp; game theory · applied cryptography · smart-contract design on Sui / Move</div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education" class="sheet crop reveal">
+    <span class="crop-tr"></span><span class="crop-bl"></span>
+    <div class="sheet-label"><span>SHEET 02 / EDUCATION</span><span>2021 — 2028</span></div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-top">
+          <span class="tl-school">EPFL</span>
+          <span class="tl-date">Sep 2025 — 2028</span>
+        </div>
+        <div class="tl-degree">Bachelor's Degree, Computer Science · Lausanne, Switzerland</div>
+        <div class="tl-meta">AVERAGE GRADE — 5.94 / 6.00</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-top">
+          <span class="tl-school">EPFL — CMS</span>
+          <span class="tl-date">Sep 2024 — 2025</span>
+        </div>
+        <div class="tl-degree">Mandatory preparatory year for holders of non-EU high school diplomas · Lausanne, Switzerland</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-top">
+          <span class="tl-school">La Résidence</span>
+          <span class="tl-date">Sep 2021 — 2024</span>
+        </div>
+        <div class="tl-degree">Moroccan Baccalaureate, Mathematical Sciences (French option) · Fès, Morocco</div>
+        <div class="tl-meta">AVERAGE GRADE — 18.82 / 20</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience" class="sheet crop reveal">
+    <span class="crop-tr"></span><span class="crop-bl"></span>
+    <div class="sheet-label"><span>SHEET 03 / EXPERIENCE</span><span>INTERNSHIP &amp; LEADERSHIP</span></div>
+
+    <div class="exp-card">
+      <div class="exp-top">
+        <span class="exp-role">Aerospace Internship — Amaze Space Camp</span>
+        <span class="exp-date">August 2023</span>
+      </div>
+      <div class="exp-org">1337, Morocco</div>
+      <ul>
+        <li>Co-organized by Morocco's Space Industry initiative, the U.S. Embassy in Morocco, and UM6P</li>
+        <li>Selected as one of 30 high-school participants nationally, from over 1,600 applicants</li>
+        <li>Built a rocket end-to-end — programmed and soldered onboard electronics, including speed and pressure sensors</li>
+        <li>Studied aerodynamics, rocket design, numerical methods, and aviation history, taught by engineers and researchers from NASA, Blue Origin, the University of New Hampshire, and Google DeepMind</li>
+      </ul>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-top">
+        <span class="exp-role">Event Manager — EPFL Rocket Team</span>
+        <span class="exp-date">Spring — Fall 2025</span>
+      </div>
+      <div class="exp-org">Lausanne, Switzerland</div>
+      <ul>
+        <li>Organized internal and external events, including presentations to professors, sponsor meetings, and coordination across subteams</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="sheet crop reveal">
+    <span class="crop-tr"></span><span class="crop-bl"></span>
+    <div class="sheet-label"><span>SHEET 04 / PROJECTS</span><span>SELECTED WORK</span></div>
+
+    <div class="proj-grid">
+      <div class="proj-card">
+        <div class="proj-title">Azul — Board Game Engine &amp; MCTS AI</div>
+        <div class="proj-tags"><span class="tag">Java</span><span class="tag">Game AI</span><span class="tag">MCTS</span></div>
+        <p class="proj-desc">Full from-scratch implementation of the Portuguese tile-laying game Azul — complete rules engine plus a custom AI opponent running parallelized Monte Carlo Tree Search across large-scale self-play simulations. Built as EPFL's CS108 Advanced OOP semester project.</p>
+        <div class="proj-foot">
+          <span class="proj-metric">206 commits · 13 branches</span>
+          <a class="proj-link" href="https://gitlab.com/DouaaKdidar/Ajul" target="_blank" rel="noopener">GitLab ↗</a>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-title">TrumpLLM — Transformer Language Model</div>
+        <div class="proj-tags"><span class="tag">Python</span><span class="tag">Transformers</span><span class="tag">NLP</span></div>
+        <p class="proj-desc">Autoregressive transformer built from scratch and trained on 2016 presidential rally transcripts, extending Andrej Karpathy's "GPT from Scratch" into an original project covering attention, positional encodings, and tokenization.</p>
+        <div class="proj-foot">
+          <span class="proj-metric">Built from scratch</span>
+          <span class="proj-noun">Private repository</span>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-title">SUIxBSA-DAYM — Blockchain Ticketing</div>
+        <div class="proj-tags"><span class="tag">Move</span><span class="tag">Sui</span><span class="tag">Smart Contracts</span></div>
+        <p class="proj-desc">Smart-contract architecture for a blockchain-based ticketing platform, built at the SUI Blockchain Hackathon to shut out predatory ticket reselling and protect the end-user experience at scale.</p>
+        <div class="proj-foot">
+          <span class="proj-metric">Hackathon build</span>
+          <span class="proj-noun">Private repository</span>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-title">SHAP — Open-Source Contribution</div>
+        <div class="proj-tags"><span class="tag">Python</span><span class="tag">Explainable AI</span></div>
+        <p class="proj-desc">Contributed to the SHAP library, extending unit-test coverage across several helper classes in the Shapley-value model-explanation pipeline.</p>
+        <div class="proj-foot">
+          <span class="proj-metric">Merged contribution</span>
+          <a class="proj-link" href="https://github.com/DouaaKdidar/shap" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-title">Stanford CS229 — ML From Scratch</div>
+        <div class="proj-tags"><span class="tag">Python</span><span class="tag">NumPy</span><span class="tag">ML</span></div>
+        <p class="proj-desc">Coursework from Andrew Ng's Machine Learning Specialization and Stanford CS229 — GLMs, SVMs, kernel methods, PCA/ICA — with decision trees, backpropagation, and a fully configurable neural-network trainer implemented from first principles.</p>
+        <div class="proj-foot">
+          <span class="proj-metric">Notes + code</span>
+          <a class="proj-link" href="https://github.com/DouaaKdidar/StanfordCS229-notes-and-projects" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-title">ConquerHack 2026 — Hackathon Strategy</div>
+        <div class="proj-tags"><span class="tag">Game Theory</span><span class="tag">Strategy</span></div>
+        <p class="proj-desc">Implementation of the game strategy used to place 2nd at The ConquerHack Hackathon, 2026.</p>
+        <div class="proj-foot">
+          <span class="proj-metric">2nd place</span>
+          <a class="proj-link" href="https://github.com/DouaaKdidar/Conquer_hack_2026" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="more-repos">
+      <div class="more-repos-label">Additional repositories</div>
+      <div class="chip-row">
+        <a class="chip-link" href="https://github.com/DouaaKdidar/Course-n1-Intro-to-Machine-Learning" target="_blank" rel="noopener">Intro to Machine Learning — notes ↗</a>
+        <a class="chip-link" href="https://github.com/DouaaKdidar/MP1_EPFL" target="_blank" rel="noopener">MP1 — Cryptography &amp; Steganography ↗</a>
+        <a class="chip-link" href="https://github.com/DouaaKdidar/MP2_EPFL" target="_blank" rel="noopener">MP2 — EPFL Mini-Project ↗</a>
+        <span class="chip-static">CS107 — Maze Game (Java), CTF prize winner</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACHIEVEMENTS -->
+  <section id="achievements" class="sheet crop reveal">
+    <span class="crop-tr"></span><span class="crop-bl"></span>
+    <div class="sheet-label"><span>SHEET 05 / ACHIEVEMENTS</span><span>2022 — 2026</span></div>
+
+    <div class="ledger">
+      <div class="ledger-row">
+        <span class="ledger-date mono">2026</span>
+        <span class="ledger-text"><b>2nd place</b> — The ConquerHack Hackathon</span>
+        <span class="ledger-mark">RESULT</span>
+      </div>
+      <div class="ledger-row">
+        <span class="ledger-date mono">2024</span>
+        <span class="ledger-text"><b>Ranked 6th nationally</b> out of 300,000+ students — Moroccan Baccalaureate, Mathematical Sciences<span class="ledger-sub">Also placed top 80 nationwide in the Concours Général des Sciences et Techniques (Mathematics)</span></span>
+        <span class="ledger-mark">RANKING</span>
+      </div>
+      <div class="ledger-row">
+        <span class="ledger-date mono">2024</span>
+        <span class="ledger-text"><b>Prix Majorant, Promotion 2024</b> — school valedictorian, highest overall average across 200+ students and all majors</span>
+        <span class="ledger-mark">AWARD</span>
+      </div>
+      <div class="ledger-row">
+        <span class="ledger-date mono">2024</span>
+        <span class="ledger-text"><b>MyTeenPreneur Pre-Incubation Program</b> — selected among 25 high-school students in Morocco, backed by MIT Sandbox and UM6P STARTGATE</span>
+        <span class="ledger-mark">PROGRAM</span>
+      </div>
+      <div class="ledger-row">
+        <span class="ledger-date mono">2023</span>
+        <span class="ledger-text"><b>3rd place</b> — NASA Space Apps Hackathon, for an app connecting users with co-founders for open-source/open-science projects</span>
+        <span class="ledger-mark">RESULT</span>
+      </div>
+      <div class="ledger-row">
+        <span class="ledger-date mono">2022–23</span>
+        <span class="ledger-text"><b>6th place regionally</b> — Moroccan National Chemistry Olympiad</span>
+        <span class="ledger-mark">RESULT</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="sheet crop reveal">
+    <span class="crop-tr"></span><span class="crop-bl"></span>
+    <div class="sheet-label"><span>SHEET 06 / SKILLS</span><span>TOOLKIT</span></div>
+
+    <div class="skills-grid">
+      <div class="skill-panel">
+        <h3>Languages</h3>
+        <div class="chip-row">
+          <span class="tag">C++</span><span class="tag">Python</span><span class="tag">Java</span><span class="tag">Move</span><span class="tag">Sui</span><span class="tag">C</span><span class="tag">LaTeX</span>
+        </div>
+      </div>
+      <div class="skill-panel">
+        <h3>Libraries</h3>
+        <div class="chip-row">
+          <span class="tag">TensorFlow</span><span class="tag">PyTorch</span><span class="tag">Scikit-learn</span><span class="tag">NumPy</span><span class="tag">SciPy</span><span class="tag">Pandas</span><span class="tag">Matplotlib</span><span class="tag">Seaborn</span>
+        </div>
+      </div>
+      <div class="skill-panel">
+        <h3>Theory &amp; Algorithms</h3>
+        <div class="chip-row">
+          <span class="tag">Graph Theory</span><span class="tag">Game Theory</span><span class="tag">Dynamic Programming</span><span class="tag">Greedy Algorithms</span><span class="tag">Data Structures</span><span class="tag">Probability</span><span class="tag">Computational Geometry</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="lang-row">
+      <span class="mono-label">Spoken</span>
+      <span class="tag">English — Fluent</span>
+      <span class="tag">French — Fluent, C2</span>
+      <span class="tag">Spanish — B2.2</span>
+      <span class="tag">German — A2</span>
+      <span class="tag">Arabic — Native</span>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="sheet crop reveal">
+    <span class="crop-tr"></span><span class="crop-bl"></span>
+    <div class="sheet-label"><span>SHEET 07 / CONTACT</span><span>LAUSANNE, CH</span></div>
+    <h2 class="contact-heading">Let's build something precise.</h2>
+    <p class="contact-sub">Open to internships, research collaborations, and hackathon teams. Reach out directly, or find the work in progress on GitHub and GitLab.</p>
+    <div class="contact-links">
+      <a class="badge-link primary" href="mailto:douaa.kdidar@epfl.ch">Email — douaa.kdidar@epfl.ch</a>
+      <a class="badge-link" href="https://github.com/DouaaKdidar" target="_blank" rel="noopener"><span class="badge-tag">GH</span> GitHub</a>
+      <a class="badge-link" href="https://www.linkedin.com/in/douaa-kdidar/" target="_blank" rel="noopener"><span class="badge-tag">LI</span> LinkedIn</a>
+      <a class="badge-link" href="https://gitlab.com/DouaaKdidar" target="_blank" rel="noopener"><span class="badge-tag">GL</span> GitLab</a>
+    </div>
+  </section>
+
+</main>
+
+<div class="title-block">
+  <span>Drawn by <b>D. Kdidar</b></span>
+  <span>Scale <b>1:1</b></span>
+  <span>Rev. <b>2026</b></span>
+  <span>Lausanne, Switzerland</span>
+</div>
+
+<script>
+  // Scroll-reveal for sheet sections
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'));
+  }
+</script>
+
+</body>
+</html>
